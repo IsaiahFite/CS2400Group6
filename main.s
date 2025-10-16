@@ -1,18 +1,18 @@
 @ Jackson T, Victor N, Isaiah F, Matt C, Mason B
-@ Group Project Phase 2 (with dual-core flow restored)
+@ Group Project Phase 3 (with dual-core flow restored)
 @ 9/9/25
 
     .equ CORE_ID, 0        @ core0 build
     ;.equ CORE_ID, 1       @ core1 build
 
 .section .data
-arr:        .word 6, 2, 7, 13, 3, 5, 7, 4, 10, 9, 3, 11, 12, 14, 7, 2, 5, 9, 2, 20
+arr:        .word 6, 2, 7, 13, 3, 5, 7, 4, 10, 9, 3, 11, 12, 14, 7, 2
 core1Done:  .word 0
 
 .section .rodata
     .align 2
 coreID:     .word CORE_ID
-arrLength:  .word 20
+arrLength:  .word 16
 
 .text
 .global main
