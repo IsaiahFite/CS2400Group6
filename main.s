@@ -32,7 +32,7 @@ main:
 	
 core0:
 	@ Sorts first half and merges both halfs
-	mov r5, r5, lsr #1			@ shift right one bit to divide a power of 2 by 2
+	mov r5, r5, lsr #1		@ shift right one bit to divide a power of 2 by 2
 	
 	bl bitonicSort			@ Expects r4 = Addr, r5 = AddrLen, r6 = dir
 	
