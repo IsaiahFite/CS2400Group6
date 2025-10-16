@@ -1,5 +1,5 @@
 @ Jackson T, Victor N, Isaiah F, Matt C, Mason B
-@ Group Project Phase 3 (with dual-core flow restored)
+@ Group Project Phase 3
 @ 9/9/25
 
     .equ CORE_ID, 0        @ core0 build
