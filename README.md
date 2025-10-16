@@ -1,46 +1,8 @@
-﻿CS2400Group6
+#﻿CS2400Group6 Bitonic Sort
 
+#Next Steps:
+-Change from GNU to Keil ASM
+-Implement Instruction Level Parallelism
 
-
-\## this is our group project ok thanks
-
-
-
-
-
-
-
-testing testing 123
-
-
-
-
-
-
-
-===
-
-
-
-
-
-Testing 456
-
-
-
-
-
-
-
-
-===
-
-
-
-
-
-
-
-
-testing 789
-
+#Finished Tasks:
+-Elimination of Halve Funcion
