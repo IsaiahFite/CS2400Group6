@@ -3,10 +3,10 @@
 @ 9/9/25
 
 .section       .data
-arr:      .word   6, 2, 7, 13, 3, 5, 7, 4, 10, 9, 3, 11, 12, 14, 7, 2, 5, 9, 2, 20
+arr:      .word   6, 2, 7, 13, 3, 5, 7, 4, 10, 9, 3, 11, 12, 14, 7, 2
 
 .section       .rodata
-arrLength:   .word   20
+arrLength:   .word   16
 
 .text
 .global main
@@ -29,60 +29,7 @@ main:
 
 end: b end                        @ stop program
 
-	.text
-	.global main
-main:
-	ldr r4, =arr			@ r4 = array's address
-	ldr r9, =arr			@ r9 = array's address; DEBUGGING
-	ldr r5, =arrLength		@ r5 = length of array's address
-	ldr r5, [r5]			@ r5 = length of array
-	mov r6, #1				@ Loads the direction as 1 into R6 (1 will create an increasing list a 0 would create a decreasing list)
-	
-	ldr r7, =coreID
-	ldr r7, [r7]
-	cmp r7, #1
-	beq core1
-	
-core0:
-	@ Sorts first half and merges both halfs
-	mov r5, r5, lsr #1			@ shift right one bit to divide a power of 2 by 2
-	
-	bl bitonicSort			@ Expects r4 = Addr, r5 = AddrLen, r6 = dir
-	
-waitForCore1:
-	ldr r7, =core1Done
-	ldr r7, [r7]
-	cmp r7, #1				@ Core1 will change the variable to 1 when it is done
-	beq finalMerge
-	b waitForCore1			@ Loop until Core1 is done sorting
-
-core1:
-	@ Sorts second half
-	mov r5, r5, lsr #1		@ shift right one bit to divide a power of 2 by 2
-	mov r0, #4
-	mul r0, r0, r5			@ Calculate bytes of halfLen
-	add r4, r0, r4			@ Calculate starting address of second half
-		
-	bl bitonicSort			@ Expects r4 = Addr, r5 = AddrLen, r6 = dir
-	
-core1FinishSort:
-	ldr r7, =core1Done
-	mov r8, #1
-	str r8, [r7]			@ Let core0 know that core1 is done by changing to 1
-	b core1FinishSort		@ Infinite loop
-	
-finalMerge:
-	@ Reset for full list
-	ldr r4, =arr			@ r4 = array's address
-	ldr r5, =arrLength		@ r5 = length of array's address
-	ldr r5, [r5]			@ r5 = length of array
-	mov r6, #1				@ r6 = accending
-	bl merge				@ final merge
-	
-
-end:  b end       @stop program
-	
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@	
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 @ merge(base,len,dir): r0=base, r1=len, r2=dir
 merge:
@@ -97,11 +44,8 @@ merge:
     cmp  r5, #1
     ble  mDone
 
-    @ compute halfLen = r5 / 2 (works for power-of-two counts)
-    mov r5, r5, lsr #1			  @ shift right one bit to divide a power of 2 by 2
-    mov r7, #4
-    mul r7, r5, r7                @ r7 = halfLen * 4 (bytes)
-    add r8, r4, r7                @ r8 = start address of second half
+    @ compute halfLen = len / 2  (BARREL SHIFTER REPLACEMENT)
+    mov  r5, r5, lsr #1               @ r5 = halfLen
 
     mov  r7, #4
     mul  r7, r5, r7                   @ r7 = halfLen * 4 (bytes)
@@ -175,10 +119,10 @@ bitonicSort:
     push {lr}
     push {r4, r5, r6}                 @ save locals
 
-    mov r5, r5, lsr #1			@ shift right one bit to divide a power of 2 by 2
-	mov r0, r5					   @ store halfLen
-	
-    bl bitonicSort                 @ sort first half (r4=start, r5=halfLen, r6=dir)
+    @ Map incoming params to original locals
+    mov  r4, r0                       @ base
+    mov  r5, r1                       @ len
+    mov  r6, r2                       @ dir
 
     cmp  r5, #1
     ble  bsDone
