@@ -2,6 +2,9 @@
 @ Group Project Phase 3
 @ 9/9/25
 
+.equ CORE_ID, 0 @ core0 build 
+;.equ CORE_ID, 1 @ core1 build
+
 .section       .data
 arr:      .word   6, 2, 7, 13, 3, 5, 7, 4, 10, 9, 3, 11, 12, 14, 7, 2
 
