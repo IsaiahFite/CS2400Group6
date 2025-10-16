@@ -20,7 +20,7 @@ arrLength:   .word   16
 	.global main
 main:
 	ldr r4, =arr			@ r4 = array's address
-	ldr r9, =arr			@ r9 = array's address; debugging
+	ldr r9, =arr			@ r9 = array's address; DEBUGGING
 	ldr r5, =arrLength		@ r5 = length of array's address
 	ldr r5, [r5]			@ r5 = length of array
 	mov r6, #1				@ Loads the direction as 1 into R6 (1 will create an increasing list a 0 would create a decreasing list)
@@ -32,7 +32,7 @@ main:
 	
 core0:
 	@ Sorts first half and merges both halfs
-	bl halve				@ Calculate halfLen
+	mov r5, r5, lsr #1			@ shift right one bit to divide a power of 2 by 2
 	
 	bl bitonicSort			@ Expects r4 = Addr, r5 = AddrLen, r6 = dir
 	
@@ -45,7 +45,7 @@ waitForCore1:
 
 core1:
 	@ Sorts second half
-	bl halve				@ Calculate halfLen
+	mov r5, r5, lsr #1		@ shift right one bit to divide a power of 2 by 2
 	mov r0, #4
 	mul r0, r0, r5			@ Calculate bytes of halfLen
 	add r4, r0, r4			@ Calculate starting address of second half
@@ -69,14 +69,6 @@ finalMerge:
 
 end:  b end       @stop program
 	
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-	
-halve:							@ This function is hardcoded divide by 2 for # = 2^n 
-	push {lr}
-	mov r5, r5, lsr #1			@ shift right one bit to divide a power of 2 by 2
-	pop {lr}
-	bx lr
-	
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@	
 
 merge:
@@ -88,7 +80,7 @@ merge:
     ble mDone
 
     @ compute halfLen = r5 / 2 (works for power-of-two counts)
-    bl halve				      @ r5 = halfLen 
+    mov r5, r5, lsr #1			  @ shift right one bit to divide a power of 2 by 2
     mov r7, #4
     mul r7, r5, r7                @ r7 = halfLen * 4 (bytes)
     add r8, r4, r7                @ r8 = start address of second half
@@ -157,7 +149,7 @@ bitonicSort:
     ble done
     push {r4, r5, r6}              @ store params
 
-    bl halve                       @ r5 = halfLen for first half
+    mov r5, r5, lsr #1			@ shift right one bit to divide a power of 2 by 2
 	mov r0, r5					   @ store halfLen
 	
     bl bitonicSort                 @ sort first half (r4=start, r5=halfLen, r6=dir)
