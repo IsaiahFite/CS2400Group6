@@ -12,7 +12,6 @@ core1Done: .word   0
 
     .section .rodata
     .align 2
-coreID: 	 .word CORE_ID        @ Identifies the core. Changes depending on build
 
 arrLength:   .word   16
 
@@ -22,27 +21,9 @@ main:
 	ldr r4, =arr			@ r4 = array's address
 	ldr r9, =arr			@ r9 = array's address; DEBUGGING
 	ldr r5, =arrLength		@ r5 = length of array's address
+	mov r6, #1				@ Loads the direction as 1 into R6 (1 will create an increasing list a 0 would create a decreasing list)	
 	ldr r5, [r5]			@ r5 = length of array
-	mov r6, #1				@ Loads the direction as 1 into R6 (1 will create an increasing list a 0 would create a decreasing list)
 	
-	ldr r7, =coreID
-	ldr r7, [r7]
-	cmp r7, #1
-	beq core1
-	
-core0:
-	@ Sorts first half and merges both halfs
-	mov r5, r5, lsr #1			@ shift right one bit to divide a power of 2 by 2
-	
-	bl bitonicSort			@ Expects r4 = Addr, r5 = AddrLen, r6 = dir
-	
-waitForCore1:
-	ldr r7, =core1Done
-	ldr r7, [r7]
-	cmp r7, #1				@ Core1 will change the variable to 1 when it is done
-	beq finalMerge
-	b waitForCore1			@ Loop until Core1 is done sorting
-
 core1:
 	@ Sorts second half
 	mov r5, r5, lsr #1		@ shift right one bit to divide a power of 2 by 2
@@ -52,13 +33,12 @@ core1:
 		
 	bl bitonicSort			@ Expects r4 = Addr, r5 = AddrLen, r6 = dir
 	
-core1FinishSort:
-	ldr r7, =core1Done
-	mov r8, #1
-	str r8, [r7]			@ Let core0 know that core1 is done by changing to 1
-	b core1FinishSort		@ Infinite loop
+core0:
+	@ Sorts first half and merges both halves
+	mov r5, r5, lsr #1			@ shift right one bit to divide a power of 2 by 2
 	
-finalMerge:
+	bl bitonicSort			@ Expects r4 = Address, r5 = AddrLength, r6 = dir
+	
 	@ Reset for full list
 	ldr r4, =arr			@ r4 = array's address
 	ldr r5, =arrLength		@ r5 = length of array's address
@@ -149,7 +129,7 @@ bitonicSort:
     ble done
     push {r4, r5, r6}              @ store params
 
-    mov r5, r5, lsr #1			@ shift right one bit to divide a power of 2 by 2
+    mov r5, r5, lsr #1		    	@ shift right one bit to divide a power of 2 by 2
 	mov r0, r5					   @ store halfLen
 	
     bl bitonicSort                 @ sort first half (r4=start, r5=halfLen, r6=dir)
