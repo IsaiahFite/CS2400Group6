@@ -3,53 +3,113 @@
 ; 10/2/25
 
         AREA    BitonicSortData, DATA, READWRITE
-arr       DCD   6, 2, 7, 13, 3, 5, 7, 4, 10, 9, 3, 11, 12, 14, 7, 2
-core1Done DCD   0          
+arr       DCD   6, 2, 7, 13, 3, 5, 7, 4, 10, 9, 3, 11, 12, 14, 7, 2         
 
         AREA    BitonicSortConst, DATA, READONLY
-        ALIGN   2
 arrLength   DCD     16
-coreID      DCD     0       ; assuming CORE_ID=0, can patch if needed
 
         AREA    BitonicSortCode, CODE, READONLY
         EXPORT  main
         ENTRY
 main
-	ldr r4, =arr			; r4 = array's address
-	ldr r9, =arr			; r9 = array's address; DEBUGGING
-	ldr r5, =arrLength		; r5 = length of array's address
-	mov r6, #1				; Loads the direction as 1 into R6 (1 will create an increasing list a 0 would create a decreasing list)	
-	ldr r5, [r5]			; r5 = length of array
-	
-core1
-	 ;Sorts second half
-	eor r6, r6, #1
-	mov r5, r5, lsr #1		; shift right one bit to divide a power of 2 by 2
-	mov r0, #4
-	mul r0, r0, r5			; Calculate bytes of halfLen
-	add r4, r0, r4			; Calculate starting address of second half
-		
-	bl bitonicSort			; Expects r4 = Addr, r5 = AddrLen, r6 = dir
+	mov r6, #1				; Direction Control
+	bl core0
+	bl core1
+	bl core2
+	bl core3
+	ldr r9, =arr			; DEBUGGING
+	b stop
 	
 core0
-	;Sorts first half and merges both halves
-	eor r6, r6, #1
-	ldr r4, =arr			; r4 = array's address
-	ldr r5, =arrLength		; r5 = length of array's address
-	ldr r5, [r5]			; r5 = length of array
-	mov r5, r5, lsr #1		; shift right one bit to divide a power of 2 by 2
+	 ; Sort first quarter
+	push {lr}
+	 ; Init array information
+	ldr r4, =arr			; r4 = array address
+	ldr r5, =arrLength
+	ldr r5, [r5]			; r5 = array length
+	mov r5, r5, lsr #2		; r5 = array length / 4
 	
-	bl bitonicSort			; Expects r4 = Address, r5 = AddrLength, r6 = dir
+	bl bitonicSort			; Sort first quarter
 	
-	;Reset for full list
-	ldr r4, =arr			; r4 = array's address
-	ldr r5, =arrLength		; r5 = length of array's address
-	ldr r5, [r5]			; r5 = length of array
-	mov r6, #1				; r6 = accending
-	bl merge				; final merge
-	
+	pop {lr}
+	bx lr
 
-end  b end       ;stop program
+core1
+	 ; Sort second quarter and merge first half
+	push {lr}
+	 ; Init array information
+	ldr r4, =arr			; r4 = array address
+	ldr r5, =arrLength
+	ldr r5, [r5]			; r5 = array length
+	push {r4-r6}
+	mov r5, r5, lsr #2		; r5 = array length / 4
+	mov r0, #4
+	mul r0, r0, r5			; r0 = calculate the bytes of quarter length
+	add r4, r4, r0			; r4 = starting address of second quarter
+	eor r6, r6, #1			; switch direction
+	
+	bl bitonicSort			; Sort second quarter
+	
+	pop {r4-r6}				; restore initial array 
+	mov r5, r5, lsr #1		; r5 = array length / 2
+	
+	bl merge				; merge first half
+	
+	pop {lr}
+	bx lr
+
+core2
+	 ; Sort third quarter
+	push {lr}
+	 ; Init array information
+	ldr r4, =arr			; r4 = array address
+	ldr r5, =arrLength
+	ldr r5, [r5]			; r5 = array length
+	mov r5, r5, lsr #1		; r5 = array length / 4
+	mov r0, #4
+	mul r0, r0, r5			; r0 = array length / 4 in bytes
+	add r4, r4, r0			; starting address of third quarter
+	
+	bl bitonicSort			; Sort third quarter
+	
+	pop {lr}
+	bx lr
+
+core3
+	 ; Sort fourth quarter and merge second half and whole list
+	push {lr}
+	 ; Init array information
+	ldr r4, =arr			; r4 = array address
+	ldr r5, =arrLength
+	ldr r5, [r5]			; r5 = array length
+	push {r4-r6}
+	push {r4-r6}
+	mov r5, r5, lsr #2		; r5 = array length / 4
+	mov r0, #12				
+	mul r0, r0, r5			; r0 = quarter of length of array * 3 in bytes
+	add r4, r4, r0			; r4 = starting address of third quarter
+	eor r6, r6, #1
+	
+	bl bitonicSort			; Sort fourth quarter
+	
+	pop {r4-r6}				; restore initial array
+	mov r5, r5, lsr #1		; r5 = array length / 4
+	mov r0, #4
+	mul r0, r0, r5			; r0 = array length / 4 in bytes
+	add r4, r4, r0			; starting address of second half
+	eor r6, r6, #1
+	
+	bl merge				; merge second half
+	
+	pop {r4-r6} 			; restore initial array
+	
+	bl merge				; merge full list
+	
+	pop {lr}
+	bx lr
+	
+stop
+end  b end       			;stop program
 	
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@	
 
