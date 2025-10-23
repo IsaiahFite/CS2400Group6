@@ -2,10 +2,21 @@
 ; Group Project Phase 3
 ; 10/2/25
 
+<<<<<<< Updated upstream
   ;  .equ CORE_ID, 0   @ core0 build
     ;.equ CORE_ID, 1   @ core1 build
+=======
+        AREA    BitonicSortData, DATA, READWRITE
+arr       DCD   6, 2, 7, 13, 3, 5, 7, 4, 10, 9, 3, 11, 12, 14, 7, 2
+core1Done DCD   0          
+>>>>>>> Stashed changes
 
+        AREA    BitonicSortConst, DATA, READONLY
+        ALIGN   2
+arrLength   DCD     16
+coreID      DCD     0       ; assuming CORE_ID=0, can patch if needed
 
+<<<<<<< Updated upstream
         AREA    BitonicSortData, DATA, READWRITE
 arr       DCD   6, 2, 7, 13, 3, 5, 7, 4, 10, 9, 3, 11, 12, 14, 7, 2
 core1Done DCD   0          
@@ -15,6 +26,8 @@ core1Done DCD   0
 arrLength   DCD     16
 coreID      DCD     0       ; assuming CORE_ID=0, can patch if needed
 
+=======
+>>>>>>> Stashed changes
         AREA    BitonicSortCode, CODE, READONLY
         EXPORT  main
         ENTRY
@@ -27,6 +40,10 @@ main
 	
 core1
 	 ;Sorts second half
+<<<<<<< Updated upstream
+=======
+	eor r6, r6, #1
+>>>>>>> Stashed changes
 	mov r5, r5, lsr #1		; shift right one bit to divide a power of 2 by 2
 	mov r0, #4
 	mul r0, r0, r5			; Calculate bytes of halfLen
@@ -36,7 +53,15 @@ core1
 	
 core0
 	;Sorts first half and merges both halves
+<<<<<<< Updated upstream
 	mov r5, r5, lsr #1			; shift right one bit to divide a power of 2 by 2
+=======
+	eor r6, r6, #1
+	ldr r4, =arr			; r4 = array's address
+	ldr r5, =arrLength		; r5 = length of array's address
+	ldr r5, [r5]			; r5 = length of array
+	mov r5, r5, lsr #1		; shift right one bit to divide a power of 2 by 2
+>>>>>>> Stashed changes
 	
 	bl bitonicSort			; Expects r4 = Address, r5 = AddrLength, r6 = dir
 	
@@ -130,7 +155,11 @@ bitonicSort
     ble done
     push {r4, r5, r6}              ; store params
 
+<<<<<<< Updated upstream
     mov r5, r5, lsr #1		    ;    shift right one bit to divide a power of 2 by 2
+=======
+    mov r5, r5, lsr #1		       ; shift right one bit to divide a power of 2 by 2
+>>>>>>> Stashed changes
 	mov r0, r5					   ; store halfLen
 	
     bl bitonicSort                 ; sort first half (r4=start, r5=halfLen, r6=dir)
