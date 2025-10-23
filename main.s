@@ -3,8 +3,8 @@
 ; 10/2/25
 
         AREA    BitonicSortData, DATA, READWRITE
-arr       DCD   6, 2, 7, 13, 3, 5, 7, 4, 10, 9, 3, 11, 12, 14, 7, 2         
-
+arr       DCD   6, 2, 7, 13, 3, 5, 7, 4, 10, 9, 3, 11, 12, 14, 7, 2 
+		  
         AREA    BitonicSortConst, DATA, READONLY
 arrLength   DCD     16
 
