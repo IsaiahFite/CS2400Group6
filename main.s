@@ -3,8 +3,8 @@
 ; 10/2/25
 
         AREA    BitonicSortData, DATA, READWRITE
-arr       DCD   6, 2, 7, 13, 3, 5, 7, 4, 10, 9, 3, 11, 12, 14, 7, 2 
-		  
+arr       DCD   6, 2, 7, 13, 3, 5, 7, 4, 10, 9, 3, 11, 12, 14, 7, 2         
+
         AREA    BitonicSortConst, DATA, READONLY
 arrLength   DCD     16
 
@@ -133,30 +133,10 @@ mLoop
     cmp r0, r8
     beq mLoopEnd
     add r1, r0, r7                ; r1 = corresponding element in second half
-    bl compAndSwap                ; compares memory at [r0] and [r1] using r6 (dir)
-    add r0, r0, #4
-    b mLoop
-
-mLoopEnd
-     ;merge first half (r4 already points to first half, r5=halfLen, r6=dir)
-    bl merge
-
-     ;merge second half (set r4 to second-half base)
-    mov r4, r8
-    bl merge
-
-mDone
-    pop {r4, r5, r6, r7, r8}
-    pop {lr}
-    bx lr
-
-
-;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-;	 The addresses of the two values that are being compared are stored in r0 and r1
-;	 The direction of the sorting is stored in r6 (1 for increasing and 0 for decreasing)
-compAndSwap
-	push {lr}
+	
+     ; compares memory at [r0] and [r1] using r6 (dir)
+	 ; The addresses of the two values that are being compared are stored in r0 and r1
+	 ; The direction of the sorting is stored in r6 (1 for increasing and 0 for decreasing)
 	push {r2, r3}					; Store the original values of r2 and r3
 	LDR r2, [r0]					; Load the first value being compared into r2
 	LDR r3, [r1]					; Load the second value being compared into r3
@@ -180,8 +160,23 @@ swap
 
 cDone
 	pop {r2, r3}					; Restore r2 and r3
-	pop {lr}						; Restore return address
-	bx lr
+	
+    add r0, r0, #4
+    b mLoop
+
+mLoopEnd
+     ;merge first half (r4 already points to first half, r5=halfLen, r6=dir)
+    bl merge
+
+     ;merge second half (set r4 to second-half base)
+    mov r4, r8
+    bl merge
+
+mDone
+    pop {r4, r5, r6, r7, r8}
+    pop {lr}
+    bx lr
+
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
