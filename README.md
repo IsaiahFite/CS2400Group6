@@ -6,7 +6,7 @@ This project implements the **Bitonic Sort** algorithm in ARM Assembly language,
 ## Course Information
 - **Course**: CS 2400-003
 - **Semester**: Fall 2025
-- **Institution**: Diane Rhodes
+- **Institution**: Metroploitan State University of Denver
 
 ## Codebase Contributers
 - Isaiah Fite
@@ -125,3 +125,4 @@ For questions or issues, please contact the team members or create an issue in t
 ---
 
 **Last Updated**: November 18, 2025
+
