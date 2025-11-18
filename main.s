@@ -2,8 +2,9 @@
 ; Group Project Phase 3
 ; 10/2/25
 
-        AREA    BitonicSortData, DATA, READWRITE
-arr       DCD   6, 2, 7, 13, 3, 5, 7, 4, 10, 9, 3, 11, 12, 14, 7, 2         
+		AREA    BitonicSortData, DATA, READWRITE
+arr       DCD   -2, -1, -3, -4, -6, -5, -7, -10, -9, -8, -11, -14, -15, -16, -13, -12
+             
 
         AREA    BitonicSortConst, DATA, READONLY
 arrLength   DCD     16
@@ -43,8 +44,7 @@ core1
 	ldr r5, [r5]			; r5 = array length
 	push {r4-r6}
 	mov r5, r5, lsr #2		; r5 = array length / 4
-	mov r0, #4
-	mul r0, r0, r5			; r0 = calculate the bytes of quarter length
+	mov r0, r5, lsl #2		; r0 = calculate the bytes of quarter length
 	add r4, r4, r0			; r4 = starting address of second quarter
 	eor r6, r6, #1			; switch direction
 	
@@ -65,9 +65,8 @@ core2
 	ldr r4, =arr			; r4 = array address
 	ldr r5, =arrLength
 	ldr r5, [r5]			; r5 = array length
-	mov r5, r5, lsr #1		; r5 = array length / 4
-	mov r0, #4
-	mul r0, r0, r5			; r0 = array length / 4 in bytes
+	mov r5, r5, lsr #1		; r5 = array length / 2
+	mov r0, r5, lsl #2		; r0 = array length / 4 in bytes
 	add r4, r4, r0			; starting address of third quarter
 	
 	bl bitonicSort			; Sort third quarter
@@ -85,7 +84,7 @@ core3
 	push {r4-r6}
 	push {r4-r6}
 	mov r5, r5, lsr #2		; r5 = array length / 4
-	mov r0, #12				
+	mov r0, #12	
 	mul r0, r0, r5			; r0 = quarter of length of array * 3 in bytes
 	add r4, r4, r0			; r4 = starting address of third quarter
 	eor r6, r6, #1
@@ -94,8 +93,7 @@ core3
 	
 	pop {r4-r6}				; restore initial array
 	mov r5, r5, lsr #1		; r5 = array length / 4
-	mov r0, #4
-	mul r0, r0, r5			; r0 = array length / 4 in bytes
+	mov r0, r5, lsl #2		; r0 = array length / 4 in bytes
 	add r4, r4, r0			; starting address of second half
 	eor r6, r6, #1
 	
@@ -123,8 +121,7 @@ merge
 
     ; compute halfLen = r5 / 2 (works for power-of-two counts)
     mov r5, r5, lsr #1			  ; shift right one bit to divide a power of 2 by 2
-    mov r7, #4
-    mul r7, r5, r7                ; r7 = halfLen * 4 (bytes)
+	mov r7, r5, lsl #2			  ; r7 = halfLen * 4 (bytes)
     add r8, r4, r7                ; r8 = start address of second half
 
     mov r0, r4                    ; pointer = start of first half
@@ -193,8 +190,7 @@ bitonicSort
 
    ;  prepare second half: compute byte offset from halfLen in r0 again
     mov r0, r5                     ; r0 = halfLen
-    mov r1, #4
-    mul r0, r0, r1                 ; r0 = halfLen * 4 (bytes)
+	mov r0, r0, lsl #2			   ; r0 = halfLen * 4 (bytes)
     add r4, r4, r0                 ; r4 = address of second half
 
     eor r6, r6, #1                 ; toggle direction for second half
